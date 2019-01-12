@@ -15,6 +15,8 @@ class ScrapingController extends Controller
         ScrapingController::index_1();
     }
 
+    // RSSサイト: http://web-terminal.blogspot.com/2013/12/2chrss.html
+    // http://www.netc.ne.jp/news/rss_list.html
     private function scraping_rss_sites() {
         return [
             'it速報' => 'http://blog.livedoor.jp/itsoku/index.rdf',
@@ -25,7 +27,9 @@ class ScrapingController extends Controller
             '稲妻速報' => 'http://inazumanews2.com/index.rdf',
             'ニュース２ちゃんねる' => 'http://news020.blog13.fc2.com/?xml',
             'ラジック' => 'http://rajic.2chblog.jp/index.rdf',
-            '働くモノニュース' => 'http://workingnews.blog117.fc2.com/?xml'
+            '働くモノニュース' => 'http://workingnews.blog117.fc2.com/?xml',
+            '【2ch】ニュー速クオリティ' => 'http://news4vip.livedoor.biz/index.rdf',
+            'ぶる速' => 'http://burusoku-vip.com/index.rdf'
         ];
     }
 
@@ -71,7 +75,7 @@ class ScrapingController extends Controller
     }
 
     public function parse_xml() {
-        $path = $this->scraping_rss_sites()['働くモノニュース'];
+        $path = $this->scraping_rss_sites()['【2ch】ニュー速クオリティ'];
         // ref: https://www.softel.co.jp/blogs/tech/archives/4105
         $rss = simplexml_load_file($path);
         $data = array();
