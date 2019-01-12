@@ -134,7 +134,7 @@ class ScrapingController extends Controller
                 $x['link'] = (string)$item->link;
                 $x['title'] = (string)$item->title;
                 $x['description'] = (string)$item->description;
-                $x['pubDate'] = (string)$item->children('http://purl.org/dc/elements/1.1/')->date . '<br>';
+                $x['pubDate'] = (string)$item->children('http://purl.org/dc/elements/1.1/')->date;
 
                 $img = $this->get_imge_source($item);
                 $x['img'] = $img;
