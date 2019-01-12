@@ -18,7 +18,17 @@ class ScrapingController extends Controller
     private function scraping_rss_sites() {
         return [
             'it速報' => 'http://blog.livedoor.jp/itsoku/index.rdf',
-            'アルファルファモザイク' => ''
+            'アルファルファモザイク' => 'http://alfalfalfa.com/index.rdf',
+            '痛いニュース' => 'http://blog.livedoor.jp/dqnplus/index.rdf',
+            '【2ch】コピペ情報局' => 'http://news.2chblog.jp/index.rdf',
+            '稲妻速報' => 'http://inazumanews2.com/index.rdf',
+            'ニュース２ちゃんねる' => 'http://news020.blog13.fc2.com/?xml'
+        ];
+    }
+
+    private function scraping_rss_sites_atom() {
+        return [
+            '常識的' => 'http://blog.livedoor.jp/jyoushiki43/atom.xml',
         ];
     }
 
@@ -31,8 +41,11 @@ class ScrapingController extends Controller
         $dom->loadHTML($html_string);
         libxml_clear_errors();
         // item(index)は何番のimgを取得するかを表す
-        $img = $dom->getElementsByTagName('img')->item(0)->getAttribute('src');
-        return $img;
+        if (!is_null($dom->getElementsByTagName('img')->item(0))) {
+           return $dom->getElementsByTagName('img')->item(0)->getAttribute('src');
+        } else {
+            return "";
+        }
     }
 
     public function parse_xml() {
@@ -56,6 +69,24 @@ class ScrapingController extends Controller
         return view('scraping.index');
     }
 
+    public function parse_xml_atom() {
+        $path = $this->scraping_rss_sites_atom()['常識的'];
+        // ref: https://www.softel.co.jp/blogs/tech/archives/4105
+        $rss = simplexml_load_file($path);
+        $data = array();
+        echo $rss->title . '<br>';
+        foreach ($rss->entry as $item) {
+            $x = array();
+            $x['link'] = (string)$item->link['href'];
+            $x['title'] = (string)$item->title . '<br>';
+            $x['description'] = (string)$item->summary . '<br>';
+            $x['pubDate'] = (string)$item->issued . '<br>';
+            $data[] = $x;
+            var_dump($x);
+        }
+
+        return view('scraping.index');
+    }
 
     // nogizaka
     public static function index_1()
