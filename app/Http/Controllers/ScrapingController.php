@@ -19,6 +19,7 @@ class ScrapingController extends Controller
         return [
             'it速報' => 'http://blog.livedoor.jp/itsoku/index.rdf',
             'アルファルファモザイク' => 'http://alfalfalfa.com/index.rdf',
+            'キニ速' => 'http://blog.livedoor.jp/kinisoku/index.rdf',
             '痛いニュース' => 'http://blog.livedoor.jp/dqnplus/index.rdf',
             '【2ch】コピペ情報局' => 'http://news.2chblog.jp/index.rdf',
             '稲妻速報' => 'http://inazumanews2.com/index.rdf',
@@ -28,6 +29,7 @@ class ScrapingController extends Controller
 
     private function scraping_rss_sites_atom() {
         return [
+            'VIPPERな俺' => 'http://blog.livedoor.jp/news23vip/atom.xml',
             '常識的' => 'http://blog.livedoor.jp/jyoushiki43/atom.xml',
         ];
     }
@@ -49,7 +51,7 @@ class ScrapingController extends Controller
     }
 
     public function parse_xml() {
-        $path = $this->scraping_rss_sites()['it速報'];
+        $path = $this->scraping_rss_sites()['キニ速'];
         // ref: https://www.softel.co.jp/blogs/tech/archives/4105
         $rss = simplexml_load_file($path);
         $data = array();

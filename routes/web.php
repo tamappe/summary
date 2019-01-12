@@ -15,4 +15,5 @@
 //    return view('welcome');
 //});
 
-Route::get('/', 'ScrapingController@parse_xml_atom');
+Route::get('/', 'ScrapingController@parse_xml');
+Route::get('/atom', 'ScrapingController@parse_xml_atom');
