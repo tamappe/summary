@@ -23,14 +23,21 @@ class ScrapingController extends Controller
             '痛いニュース' => 'http://blog.livedoor.jp/dqnplus/index.rdf',
             '【2ch】コピペ情報局' => 'http://news.2chblog.jp/index.rdf',
             '稲妻速報' => 'http://inazumanews2.com/index.rdf',
-            'ニュース２ちゃんねる' => 'http://news020.blog13.fc2.com/?xml'
+            'ニュース２ちゃんねる' => 'http://news020.blog13.fc2.com/?xml',
+            'ラジック' => 'http://rajic.2chblog.jp/index.rdf',
+            '働くモノニュース' => 'http://workingnews.blog117.fc2.com/?xml'
         ];
     }
 
     private function scraping_rss_sites_atom() {
         return [
             'VIPPERな俺' => 'http://blog.livedoor.jp/news23vip/atom.xml',
+            'ハムスター速報' => 'http://hamusoku.com/atom.xml',
             '常識的' => 'http://blog.livedoor.jp/jyoushiki43/atom.xml',
+            '暇人速報' => 'http://blog.livedoor.jp/himasoku123/atom.xml',
+            'ライフハック' => 'http://lifehack2ch.livedoor.biz/atom.xml',
+            'カオスちゃんねる' => 'http://chaos2ch.com/atom.xml',
+            '哲学ニュース' => 'http://blog.livedoor.jp/nwknews/atom.xml'
         ];
     }
 
@@ -51,7 +58,7 @@ class ScrapingController extends Controller
     }
 
     public function parse_xml() {
-        $path = $this->scraping_rss_sites()['キニ速'];
+        $path = $this->scraping_rss_sites()['働くモノニュース'];
         // ref: https://www.softel.co.jp/blogs/tech/archives/4105
         $rss = simplexml_load_file($path);
         $data = array();
@@ -72,7 +79,7 @@ class ScrapingController extends Controller
     }
 
     public function parse_xml_atom() {
-        $path = $this->scraping_rss_sites_atom()['常識的'];
+        $path = $this->scraping_rss_sites_atom()['ハムスター速報'];
         // ref: https://www.softel.co.jp/blogs/tech/archives/4105
         $rss = simplexml_load_file($path);
         $data = array();
