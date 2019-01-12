@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Goutte\Client;
 use App\Models\Entry;
 use DOMDocument;
+use DateTime;
 
 class ScrapingController extends Controller
 {
@@ -241,5 +242,30 @@ class ScrapingController extends Controller
             $data[] = $x;
             var_dump($x);
         }
+    }
+
+    public function rss2() {
+        $path = 'http://toriizaka46.jp/feed/';
+        // ref: https://www.softel.co.jp/blogs/tech/archives/4105
+        $rss = simplexml_load_file($path);
+
+        $data = array();
+        echo $rss->channel->title . '<br>';
+        foreach ($rss->channel->item as $item) {
+            $x = array();
+            $x['title'] = (string)$item->title . '<br>';
+            $x['link'] = (string)$item->link . '<br>';
+//            $x['description'] = (string)$item->description . '<br>';
+
+            $date = new DateTime();
+            $date->setTimestamp(strtotime($item->pubDate));
+            $x['pubDate'] = (string)$date->format('Y-m-d H:i:s') . '<br>';
+
+//            $img = $this->get_imge_source($item);
+//            $x['img'] = $img  . '<br>';
+            $data[] = $x;
+        }
+        var_dump($data);
+        return view('scraping.index');
     }
 }

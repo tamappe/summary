@@ -24,3 +24,5 @@ Route::get('/api/index', 'Api\EntryController@index');
 Route::get('/admin/form', 'ScrapingController@form');
 Route::post('/rss', 'ScrapingController@result_rss');
 Route::post('/atom', 'ScrapingController@result_atom');
+
+Route::get('/scraping', 'ScrapingController@rss2');
