@@ -6,6 +6,7 @@ use App\Models\Blog;
 use Illuminate\Http\Request;
 use Goutte\Client;
 use App\Models\Entry;
+use DOMDocument;
 
 class ScrapingController extends Controller
 {
@@ -14,9 +15,46 @@ class ScrapingController extends Controller
         ScrapingController::index_1();
     }
 
-    public function parse_xml() {
-        ScrapingController::parse_xml_rss();
+    private function scraping_rss_sites() {
+        return [
+            'it速報' => 'http://blog.livedoor.jp/itsoku/index.rdf',
+            'アルファルファモザイク' => ''
+        ];
     }
+
+    private function get_imge_source($item) {
+        //contentデータ取得
+        $content = $item->children('content', 'http://purl.org/rss/1.0/modules/content/');
+        $html_string = $content->encoded;
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($html_string);
+        libxml_clear_errors();
+        // item(index)は何番のimgを取得するかを表す
+        $img = $dom->getElementsByTagName('img')->item(0)->getAttribute('src');
+        return $img;
+    }
+
+    public function parse_xml() {
+        $path = $this->scraping_rss_sites()['it速報'];
+        // ref: https://www.softel.co.jp/blogs/tech/archives/4105
+        $rss = simplexml_load_file($path);
+        $data = array();
+        foreach ($rss->item as $item) {
+            $x = array();
+            $x['link'] = (string)$item->link;
+            $x['title'] = (string)$item->title . '<br>';
+            $x['description'] = (string)$item->description . '<br>';
+            $x['pubDate'] = (string)$item->children('http://purl.org/dc/elements/1.1/')->date . '<br>';
+
+            $img = $this->get_imge_source($item);
+            $x['img'] = $img  . '<br>';
+            $data[] = $x;
+        }
+        var_dump($data);
+        return view('scraping.index');
+    }
+
 
     // nogizaka
     public static function index_1()
@@ -71,9 +109,8 @@ class ScrapingController extends Controller
         return view('scraping.index');
     }
 
-    public static function parse_xml_rss()
+    public function parse_xml_rss()
     {
-        echo "a";
-        return view('scraping.index');
+
     }
 }
