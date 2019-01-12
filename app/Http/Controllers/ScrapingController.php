@@ -181,4 +181,65 @@ class ScrapingController extends Controller
 
         return view('scraping.index');
     }
+
+    public function form()
+    {
+        return view('scraping.form');
+    }
+
+    public function result_rss(Request $request)
+    {
+
+        if (!is_null($request->rss)) {
+            $this->confirm_rss($request->rss);
+        }
+        return view('scraping.index');
+    }
+
+    public function result_atom(Request $request)
+    {
+
+        if (!is_null($request->atom)) {
+            $this->confirm_atom($request->atom);
+        }
+        return view('scraping.index');
+    }
+
+    private function confirm_rss($path) {
+        // ref: https://www.softel.co.jp/blogs/tech/archives/4105
+        $rss = simplexml_load_file($path);
+        $data = array();
+        echo $rss->channel->title . '<br>';
+        foreach ($rss->item as $item) {
+            $x = array();
+            $x['link'] = (string)$item->link;
+            $x['title'] = (string)$item->title . '<br>';
+            $x['description'] = (string)$item->description . '<br>';
+            $x['pubDate'] = (string)$item->children('http://purl.org/dc/elements/1.1/')->date . '<br>';
+
+            $img = $this->get_imge_source($item);
+            $x['img'] = $img  . '<br>';
+            $data[] = $x;
+        }
+        var_dump($data);
+    }
+
+    private function confirm_atom($path) {
+        // ref: https://www.softel.co.jp/blogs/tech/archives/4105
+        $rss = simplexml_load_file($path);
+        $data = array();
+        echo $rss->title . '<br>';
+        foreach ($rss->entry as $item) {
+            $x = array();
+            $x['link'] = (string)$item->link['href'];
+            $x['title'] = (string)$item->title . '<br>';
+            $x['description'] = (string)$item->summary . '<br>';
+            $x['pubDate'] = (string)$item->issued . '<br>';
+
+            $img = $this->get_imge_source_atom((string)$item->content);
+            $x['img'] = $img  . '<br>';
+            $data[] = $x;
+            var_dump($x);
+        }
+    }
 }
