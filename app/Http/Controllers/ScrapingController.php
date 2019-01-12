@@ -10,10 +10,6 @@ use DOMDocument;
 
 class ScrapingController extends Controller
 {
-    //
-    public function index1() {
-        ScrapingController::index_1();
-    }
 
     // RSSサイト: http://web-terminal.blogspot.com/2013/12/2chrss.html
     // http://www.netc.ne.jp/news/rss_list.html
@@ -117,61 +113,72 @@ class ScrapingController extends Controller
         return view('scraping.index');
     }
 
-    // nogizaka
-    public static function index_1()
-    {
-        $client = new Client();
-        // 基本形
-//        $crawler = $client->request('GET', 'https://www.symfony.com/blog/');
-//        $crawler->filter('h2 > a')->each(function ($node) {
-//            print $node->text()."\n";
-//        });
-        //  乃木坂46まとめの「ま」
-        $crawler = $client->request('GET', 'http://nogizaka46matomenoma.blog.jp/');
-//        $blog_title = $crawler->filter('div.content-article-inner')->text();
-//        echo 'blog_title: '. $blog_title;
-//        echo '<br/>';
-//        echo '<br/>';
-        // 回したい場合
-        $blog_title = $crawler->filter('header h1 a')->text();
-        $blog = new Blog();
-        if (!$blog->entryExists($blog_title)) {
-            $blog->title = $blog_title;
-            $blog->category = config('const.CATEGORIES')[0];
-            $blog->save();
-            echo 'ブログタイトルデータの保存成功';
-        } else {
-            echo 'すでに作成しています';
-        }
-        $crawler->filter('article.article')->each(function ($node) use ($blog_title) {
-            $entry = new Entry();
-            if (!$entry->entryExists($node->filter('h1 a')->text())) {
-                $entry->title = $node->filter('h1 a')->text();
-                $entry->link_url = $node->filter('h1 a')->attr('href');
-                $entry->image_url = $node->filter('div.ArticleFirstImageThumbnail a img')->attr('src');
-                $entry->published = $node->filter('header.article-header p time')->attr('datetime');
-                $blog_info = Blog::where('title', $blog_title)->first();
-                $entry->blog_id = $blog_info->id;
-                $entry->save();
-                echo '記事データの保存成功';
+    public function save_xml() {
+        foreach ($this->scraping_rss_sites() as $key => $value) {
+            $path = $value;
+            // ref: https://www.softel.co.jp/blogs/tech/archives/4105
+            $rss = simplexml_load_file($path);
+            $data = array();
+
+            $blog_title = $rss->channel->title;
+            $blog = new Blog();
+            if (!$blog->entryExists($blog_title)) {
+                $blog->title = $blog_title;
+                $blog->save();
+                echo 'ブログタイトルの保存成功';
             } else {
                 echo 'すでに作成しています';
             }
-//            echo 'title: '. $node->filter('h1 a')->text();
-//            echo '<br/>';
-//            echo 'link: '. $node->filter('h1 a')->attr('href');
-//            echo '<br/>';
-//            echo 'image: '. $node->filter('div.ArticleFirstImageThumbnail a img')->attr('src');
-//            echo '<br/>';
-//            echo 'date: '. $node->filter('header.article-header p time')->attr('datetime');
-//            echo '<br/>';
+            foreach ($rss->item as $item) {
+                $x = array();
+                $x['link'] = (string)$item->link;
+                $x['title'] = (string)$item->title;
+                $x['description'] = (string)$item->description;
+                $x['pubDate'] = (string)$item->children('http://purl.org/dc/elements/1.1/')->date . '<br>';
 
-        });
+                $img = $this->get_imge_source($item);
+                $x['img'] = $img;
+                $data[] = $x;
+
+                $entry = new Entry();
+                if (!$entry->entryExists($x['link'])) {
+                    $entry->title = $x['link'];
+                    $entry->link_url = $x['link'];
+                    $entry->image_url = $x['img'];
+                    $entry->published = $x['pubDate'];
+                    $blog_info = Blog::where('title', $blog_title)->first();
+                    $entry->blog_id = $blog_info->id;
+                    $entry->save();
+                    echo '記事データの保存成功';
+                } else {
+                    echo 'すでに作成しています';
+                }
+            }
+            sleep(5);
+        }
+
         return view('scraping.index');
     }
 
-    public function parse_xml_rss()
-    {
+    public function save_xml_atom() {
+        $path = $this->scraping_rss_sites_atom()['ハムスター速報'];
+        // ref: https://www.softel.co.jp/blogs/tech/archives/4105
+        $rss = simplexml_load_file($path);
+        $data = array();
+        echo $rss->title . '<br>';
+        foreach ($rss->entry as $item) {
+            $x = array();
+            $x['link'] = (string)$item->link['href'];
+            $x['title'] = (string)$item->title . '<br>';
+            $x['description'] = (string)$item->summary . '<br>';
+            $x['pubDate'] = (string)$item->issued . '<br>';
 
+            $img = $this->get_imge_source_atom((string)$item->content);
+            $x['img'] = $img  . '<br>';
+            $data[] = $x;
+            var_dump($x);
+        }
+
+        return view('scraping.index');
     }
 }

@@ -15,6 +15,11 @@ class CreateEntriesTable extends Migration
     {
         Schema::create('entries', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('title');
+            $table->string('image_url')->nullable();
+            $table->dateTime('published')->nullable();
+            $table->string('link_url');
+            $table->integer('blog_id');
             $table->timestamps();
         });
     }
