@@ -40,6 +40,7 @@ class ScrapingController extends Controller
         // ref: https://www.softel.co.jp/blogs/tech/archives/4105
         $rss = simplexml_load_file($path);
         $data = array();
+        echo $rss->channel->title . '<br>';
         foreach ($rss->item as $item) {
             $x = array();
             $x['link'] = (string)$item->link;
