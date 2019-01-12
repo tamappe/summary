@@ -57,6 +57,19 @@ class ScrapingController extends Controller
         }
     }
 
+    private function get_imge_source_atom($item) {
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($item);
+        libxml_clear_errors();
+        // item(index)は何番のimgを取得するかを表す
+        if (!is_null($dom->getElementsByTagName('img')->item(0))) {
+            return $dom->getElementsByTagName('img')->item(0)->getAttribute('src');
+        } else {
+            return "";
+        }
+    }
+
     public function parse_xml() {
         $path = $this->scraping_rss_sites()['働くモノニュース'];
         // ref: https://www.softel.co.jp/blogs/tech/archives/4105
@@ -90,6 +103,9 @@ class ScrapingController extends Controller
             $x['title'] = (string)$item->title . '<br>';
             $x['description'] = (string)$item->summary . '<br>';
             $x['pubDate'] = (string)$item->issued . '<br>';
+
+            $img = $this->get_imge_source_atom((string)$item->content);
+            $x['img'] = $img  . '<br>';
             $data[] = $x;
             var_dump($x);
         }
