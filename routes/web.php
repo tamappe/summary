@@ -15,7 +15,7 @@
 //    return view('welcome');
 //});
 
-Route::get('/save', 'ScrapingController@save_xml');
+Route::get('/save/rss1', 'ScrapingController@save_xml_rss1');
 Route::get('/save/atom', 'ScrapingController@parse_xml_atom');
 
 Route::get('/', 'Api\EntryController@index');

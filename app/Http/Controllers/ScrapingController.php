@@ -114,7 +114,7 @@ class ScrapingController extends Controller
         return view('scraping.index');
     }
 
-    public function save_xml() {
+    public function save_xml_rss1() {
         foreach ($this->scraping_rss_sites() as $key => $value) {
             $path = $value;
             // ref: https://www.softel.co.jp/blogs/tech/archives/4105
@@ -125,6 +125,8 @@ class ScrapingController extends Controller
             $blog = new Blog();
             if (!$blog->entryExists($blog_title)) {
                 $blog->title = $blog_title;
+                $blog->rss_url = $path;
+                $blog->rss_type = 'rss1';
                 $blog->save();
                 echo 'ブログタイトルの保存成功';
             } else {
