@@ -14,7 +14,7 @@ class ScrapingController extends Controller
 
     // RSSサイト: http://web-terminal.blogspot.com/2013/12/2chrss.html
     // http://www.netc.ne.jp/news/rss_list.html
-    private function scraping_rss_sites() {
+    private static function scraping_rss_sites() {
         return [
             'it速報' => 'http://blog.livedoor.jp/itsoku/index.rdf',
             'アルファルファモザイク' => 'http://alfalfalfa.com/index.rdf',
@@ -30,7 +30,7 @@ class ScrapingController extends Controller
         ];
     }
 
-    private function scraping_rss_sites_atom() {
+    private static function scraping_rss_sites_atom() {
         return [
             'VIPPERな俺' => 'http://blog.livedoor.jp/news23vip/atom.xml',
             'ハムスター速報' => 'http://hamusoku.com/atom.xml',
@@ -42,7 +42,7 @@ class ScrapingController extends Controller
         ];
     }
 
-    private function get_imge_source($item) {
+    private static function get_imge_source($item) {
         //contentデータ取得
         $content = $item->children('content', 'http://purl.org/rss/1.0/modules/content/');
         $html_string = $content->encoded;
@@ -58,7 +58,7 @@ class ScrapingController extends Controller
         }
     }
 
-    private function get_imge_source_atom($item) {
+    private static function get_imge_source_atom($item) {
         $dom = new DOMDocument();
         libxml_use_internal_errors(true);
         $dom->loadHTML($item);
@@ -114,8 +114,8 @@ class ScrapingController extends Controller
         return view('scraping.index');
     }
 
-    public function save_xml_rss1() {
-        foreach ($this->scraping_rss_sites() as $key => $value) {
+    public static function save_xml_rss1() {
+        foreach (ScrapingController::scraping_rss_sites() as $key => $value) {
             $path = $value;
             // ref: https://www.softel.co.jp/blogs/tech/archives/4105
             $rss = simplexml_load_file($path);
@@ -139,7 +139,7 @@ class ScrapingController extends Controller
                 $x['description'] = (string)$item->description;
                 $x['pubDate'] = (string)$item->children('http://purl.org/dc/elements/1.1/')->date;
 
-                $img = $this->get_imge_source($item);
+                $img = ScrapingController::get_imge_source($item);
                 $x['img'] = $img;
                 $data[] = $x;
 
