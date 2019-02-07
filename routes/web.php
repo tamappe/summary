@@ -20,7 +20,6 @@ Route::get('/save/atom', 'ScrapingController@parse_xml_atom');
 
 Route::get('/', 'Api\EntryController@index');
 Route::get('/api/index', 'Api\EntryController@index');
-Route::get('/api/index', 'Api\EntryController@index');
 Route::get('/api/blog/{id}', 'Api\EntryController@blog');
 Route::get('/api/blog', 'Api\BlogController@index');
 
