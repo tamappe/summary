@@ -144,8 +144,8 @@ class ScrapingController extends Controller
                 $data[] = $x;
 
                 $entry = new Entry();
-                if (!$entry->entryExists($x['link'])) {
-                    $entry->title = $x['link'];
+                if (!$entry->entryExists($x['title'])) {
+                    $entry->title = $x['title'];
                     $entry->link_url = $x['link'];
                     $entry->image_url = $x['img'];
                     $entry->published = $x['pubDate'];
